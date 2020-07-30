@@ -1,18 +1,41 @@
 <!--              property binding      local reference-->
 <!-- <textarea rows="6" [value]="newPost" #postInput></textarea> -->
 <mat-card>
-  <mat-form-field>
-    <input matInput type="text" [(ngModel)]="enteredTitle">
-  </mat-form-field>
-  <mat-form-field>
-    <!--              two way biding -->
-    <textarea matInput rows="6" [(ngModel)]="enteredValue"></textarea>
-  </mat-form-field>
+  <!-- local reference -->
+  <form (submit)="onAddPost(postForm)" #postForm="ngForm">
+    <mat-form-field>
+      <input
+        matInput
+        type="text"
+        name="title"
+        ngModel
+        required
+        minlength="3"
+        #title="ngModel"
+      />
+      <mat-error *ngIf="title.invalid">Please enter a title.</mat-error>
+      <!-- <mat-error *postForm.getControl('title').invalid ">{{}}</mat-error> -->
+    </mat-form-field>
+    <mat-form-field>
+      <!--                          two way biding -->
+      <!-- <textarea matInput rows="6" [(ngModel)]="enteredValue"></textarea> -->
+      <textarea
+        matInput
+        rows="4"
+        name="content"
+        ngModel
+        required
+        #content="ngModel"
+      ></textarea>
+      <mat-error *ngIf="content.invalid">Please enter content.</mat-error>
+    </mat-form-field>
 
-<!--                                  event listener -->
-  <button mat-raised-button color="accent" (click)="onAddPost()">
-    Save Post
-  </button>
+    <!--                                      event listener -->
+    <!-- <button mat-raised-button color="accent" (click)="onAddPost()"> -->
+    <button mat-raised-button color="accent" type="submit">
+      Save Post
+    </button>
+  </form>
 </mat-card>
 
 <hr />
