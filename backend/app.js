@@ -41,12 +41,14 @@ app.post("/api/posts", async (req, res, next) => {
     content: req.body.content,
   });
   try {
-    await post.save();
-    res.status(201).json({ message: "Post added successfully" });
+    const result = await post.save();
+    res
+      .status(201)
+      .json({ message: "Post added successfully", postId: result._id });
   } catch (error) {}
 });
 
-app.use("/api/posts", async (req, res, next) => {
+app.get("/api/posts", async (req, res, next) => {
   let posts;
   try {
     posts = await Post.find();
@@ -54,6 +56,13 @@ app.use("/api/posts", async (req, res, next) => {
       message: "Fetch post successfully",
       posts,
     });
+  } catch (error) {}
+});
+
+app.delete("/api/posts/:id", async (req, res, next) => {
+  try {
+    result = await Post.deleteOne({ _id: req.params.id });
+    res.status(200).json({ message: "Post deleted!" });
   } catch (error) {}
 });
 
