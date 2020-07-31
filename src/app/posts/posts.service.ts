@@ -2,6 +2,7 @@ import { Post } from './post.model';
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { map } from 'rxjs/operators';
 
 // dependency injection or add service to providers array
 @Injectable({ providedIn: 'root' })
@@ -13,11 +14,18 @@ export class PostsService {
 
   getPosts() {
     this.http
-      .get<{ meesage: string; posts: Post[] }>(
-        'http://localhost:3000/api/posts'
+      .get<{ meesage: string; posts: any }>('http://localhost:3000/api/posts')
+      .pipe(
+        map((data) => {
+          return data.posts.map((post) => ({
+            id: post._id,
+            title: post.title,
+            content: post.content,
+          }));
+        })
       )
-      .subscribe((data) => {
-        this.posts = data.posts;
+      .subscribe((posts) => {
+        this.posts = posts;
         // inform the update
         this.postsUpdated.next([...this.posts]);
       });
