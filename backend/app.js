@@ -1,7 +1,23 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
+require("dotenv").config();
+
+const Post = require("./models/post");
 
 const app = express();
+
+mongoose
+  .connect(process.env.MONGODB_LINK, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log("Connected to mongoDB");
+  })
+  .catch(() => {
+    console.log("Connect to DB failed!");
+  });
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -19,34 +35,26 @@ app.use((req, res, next) => {
   next();
 });
 
-app.post("/api/posts", (req, res, next) => {
-  const post = req.body;
-  console.log(post);
-  res.status(201).json({ message: "Post added successfully" });
+app.post("/api/posts", async (req, res, next) => {
+  const post = new Post({
+    title: req.body.title,
+    content: req.body.content,
+  });
+  try {
+    await post.save();
+    res.status(201).json({ message: "Post added successfully" });
+  } catch (error) {}
 });
 
-app.use("/api/posts", (req, res, next) => {
-  const posts = [
-    {
-      id: "id1fkljvo453",
-      title: "First post title",
-      content: "The first post's content",
-    },
-    {
-      id: "id2fk534o453",
-      title: "Second post title",
-      content: "The second post's content",
-    },
-    {
-      id: "id3fkkm32453",
-      title: "Third post title",
-      content: "The third post's content",
-    },
-  ];
-  res.status(200).json({
-    message: "Fetch post successfully",
-    posts,
-  });
+app.use("/api/posts", async (req, res, next) => {
+  let posts;
+  try {
+    posts = await Post.find();
+    res.status(200).json({
+      message: "Fetch post successfully",
+      posts,
+    });
+  } catch (error) {}
 });
 
 module.exports = app;
