@@ -47,7 +47,6 @@ router.delete("/:id", async (req, res, next) => {
 });
 
 router.put("/:id", async (req, res, next) => {
-  console.log(req.body.id);
   const post = new Post({
     _id: req.params.id,
     title: req.body.title,
