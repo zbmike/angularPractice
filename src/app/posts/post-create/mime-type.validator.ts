@@ -34,6 +34,7 @@ export const mimeType = (
             isValid = false; // Or you can use the blob.type as fallback
             break;
         }
+        // return null for valid result, something else otherwise
         if (isValid) {
           observer.next(null);
         } else {
