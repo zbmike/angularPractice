@@ -82,16 +82,26 @@ router.delete("/:id", async (req, res, next) => {
   } catch (error) {}
 });
 
-router.put("/:id", async (req, res, next) => {
-  const post = new Post({
-    _id: req.params.id,
-    title: req.body.title,
-    content: req.body.content,
-  });
-  try {
-    await Post.updateOne({ _id: req.params.id }, post);
-    res.status(200).json({ message: "Post updated successfully!" });
-  } catch (error) {}
-});
+router.put(
+  "/:id",
+  multer({ storage }).single("image"),
+  async (req, res, next) => {
+    let imagePath = req.body.imagePath;
+    if (req.file) {
+      const url = req.protocol + "://" + req.get("host");
+      imagePath = url + "/images/" + req.file.filename;
+    }
+    const post = new Post({
+      _id: req.params.id,
+      title: req.body.title,
+      content: req.body.content,
+      imagePath,
+    });
+    try {
+      await Post.updateOne({ _id: req.params.id }, post);
+      res.status(200).json({ message: "Post updated successfully!" });
+    } catch (error) {}
+  }
+);
 
 module.exports = router;
