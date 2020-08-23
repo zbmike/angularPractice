@@ -18,27 +18,40 @@ const storage = multer.diskStorage({
     if (isValid) {
       error = null;
     }
-    cb(error, "backend/image");
+    cb(error, "backend/images");
   },
   filename: (req, file, cb) => {
+    console.log(file);
     const name = file.originalname.toLowerCase().split(" ").join("-");
     const ext = MIME_TYPE_MAP[file.mimetype];
     cb(null, name + "-" + Date.now() + "." + ext);
   },
 });
 
-router.post("/", mult(storage).single("image"), async (req, res, next) => {
-  const post = new Post({
-    title: req.body.title,
-    content: req.body.content,
-  });
-  try {
-    const result = await post.save();
-    res
-      .status(201)
-      .json({ message: "Post added successfully", postId: result._id });
-  } catch (error) {}
-});
+router.post(
+  "/",
+  multer({ storage }).single("image"),
+  async (req, res, next) => {
+    const url = req.protocol + "://" + req.get("host");
+    const post = new Post({
+      title: req.body.title,
+      content: req.body.content,
+      imagePath: url + "/images/" + req.file.filename,
+    });
+    try {
+      const result = await post.save();
+      res.status(201).json({
+        message: "Post added successfully",
+        post: {
+          id: post._id,
+          title: post.title,
+          content: post.content,
+          imagePath: post.imagePath,
+        },
+      });
+    } catch (error) {}
+  }
+);
 
 router.get("/", async (req, res, next) => {
   let posts;
