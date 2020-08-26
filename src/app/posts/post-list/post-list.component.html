@@ -1,12 +1,12 @@
 <mat-spinner *ngIf="isLoading"></mat-spinner>
-<mat-accordion multi="true" *ngIf="posts.length > 0 && !isLoading" >
+<mat-accordion multi="true" *ngIf="posts.length > 0 && !isLoading">
   <!-- directive for loop (*ngFor) to replicate multiple instances -->
   <mat-expansion-panel *ngFor="let post of posts">
     <mat-expansion-panel-header>
       {{ post.title }}
     </mat-expansion-panel-header>
     <div class="post-image">
-      <img [src]="post.imagePath" [alt]="post.title">
+      <img [src]="post.imagePath" [alt]="post.title" />
     </div>
     <p>{{ post.content }}</p>
     <mat-action-row>
@@ -19,4 +19,13 @@
     </mat-action-row>
   </mat-expansion-panel>
 </mat-accordion>
-<p class="mat-body-1 info-text" *ngIf="posts.length <= 0 && !isLoading">No post yet!</p>
+<mat-paginator
+  [length]="totalPosts"
+  [pageSize]="postsPerPage"
+  [pageSizeOptions]="pageSizeOptions"
+  (page)="onChangedPage($event)"
+  *ngIf="posts.length > 0"
+></mat-paginator>
+<p class="mat-body-1 info-text" *ngIf="posts.length <= 0 && !isLoading">
+  No post yet!
+</p>

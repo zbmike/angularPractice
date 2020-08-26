@@ -21,7 +21,6 @@ const storage = multer.diskStorage({
     cb(error, "backend/images");
   },
   filename: (req, file, cb) => {
-    console.log(file);
     const name = file.originalname.toLowerCase().split(" ").join("-");
     const ext = MIME_TYPE_MAP[file.mimetype];
     cb(null, name + "-" + Date.now() + "." + ext);
@@ -54,12 +53,22 @@ router.post(
 );
 
 router.get("/", async (req, res, next) => {
-  let posts;
+  const pageSize = +req.query.pagesize;
+  const currentPage = +req.query.page;
+  let posts, count;
   try {
-    posts = await Post.find();
+    if (pageSize && currentPage) {
+      posts = await Post.find()
+        .skip(pageSize * (currentPage - 1))
+        .limit(pageSize);
+    } else {
+      posts = await Post.find();
+    }
+    count = await Post.count();
     res.status(200).json({
       message: "Fetch post successfully",
       posts,
+      maxPosts: count,
     });
   } catch (error) {}
 });
